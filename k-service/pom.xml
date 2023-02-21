@@ -11,5 +11,29 @@
 
     <artifactId>k-service</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.kk</groupId>
+            <artifactId>k-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.kk</groupId>
+            <artifactId>k-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.kk</groupId>
+            <artifactId>k-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
 
 </project>

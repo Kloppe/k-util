@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author juejin
  * @datetime 2023/2/21
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.kk")
 public class Application {
 
     public static void main(String[] args) {
