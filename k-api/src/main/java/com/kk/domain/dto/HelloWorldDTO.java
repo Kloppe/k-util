@@ -16,4 +16,11 @@ public class HelloWorldDTO extends DefaultSerializable {
 
     public String hello;
 
+
+    @Override
+    public String toString() {
+        return "HelloWorldDTO{" +
+                "hello='" + hello + '\'' +
+                '}';
+    }
 }
