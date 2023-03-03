@@ -1,0 +1,20 @@
+@startuml
+TarzanShopQueryAPI -> TarzanShopQueryAPI: 调用recommend()\n获取店铺的推荐结果
+note left: 传入rubanId、channel、\nbusinessType查询推荐的店铺
+TarzanShopQueryAPI -> TarzanShopFacade: 调用recommend()查询店铺推荐
+note left: 走降级逻辑 \nrecommend()和\nrecommendWithCache()
+TarzanShopFacade -> TarzanParamHandleFacade: 调用perfectSearchParamAndCheck()\n获取泰山配置参数
+TarzanParamHandleFacade -> TarzanService: 调用getByRubanCode()\n获取TarzanView配置参数
+TarzanParamHandleFacade -> TarzanParamHandleFacade: 将TarzanView封装成SearchParam返回
+TarzanParamHandleFacade -> TarzanShopFacade: 返回SearchParam查询参数
+TarzanShopFacade -> TarzanShopMetaFacade: 调用listByParam(ShopSearchParam)查询店铺数据\n根据tarzanId从TarzanShop表中获取店铺列表
+note left: 泰山的店铺数据是从招商同步
+TarzanShopMetaFacade -> TarzanShopMetaFacade: 1.根据排序策略和过滤策略返回排序ShopMetaView列表\n2.将ShopMetaView转化为TarzanShopDTO
+note left: TarzanShopDTO是使用filter模式将字段塞入
+TarzanShopMetaFacade -> TarzanShopFacade: 返回TarzanShopDTO列表
+TarzanShopQueryAPI -> TarzanShopFacade: 调用preview()预览店铺素材数据\n设置预览时间
+note left: 预览店铺数据(增加预览时间)
+TarzanShopFacade -> TarzanShopMetaFacade:调用preview()查询店铺元数据
+TarzanShopMetaFacade -> TarzanShopMetaFacade: 逻辑相同，根据预览时间查询还在display的店铺
+TarzanShopMetaFacade -> TarzanShopFacade: 返回店铺元数据
+@enduml

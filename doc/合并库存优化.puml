@@ -1,0 +1,24 @@
+@startuml
+==StockOperateAPI#operateOrderStock(下单修改库存)==
+StockOperateAPI -> StockOperateAPI: 1. 参数校验\n2.检查是否有保留库存
+note right: 入参StockOperateParam\n核心参数eventType、orderStockParamList(\norderId,skuid,itemid,changeCount,activityId)
+activate StockOperateAPI
+StockOperateAPI -> StockOperateAPI: 判断是否需要走合并库存\n 判断条件\n1.订单sku为1个、提交订单或者支付订单eventType事件
+StockOperateAPI -> StockOperateAPI: 1.根据skuId-activityId-orderEvent\n维度创建秒杀计数组killGroup(String)\n2.对killGroup进行线程原子+1计数\n3.计数使用ConcurrentHa<String, AtomicInteger>
+StockOperateAPI -> skuStockChangeLogService: 除了提交订单eventType可以重复，\n其他的eventType需要进行幂等处理shMap
+skuStockChangeLogService -> skuStockChangeLogService: 根据itemId-orderId-eventType分表查询\n2.orderId是商品级订单，加上eventType可以确定唯一。\n return List<SkuStockChangeLogEntity>
+StockOperateAPI -> StockOperateAPI: 如果被幂等了，直接返回报错。\n否则继续走合并秒杀逻辑。
+StockOperateAPI -> secKillStockBusiness: 调用isWaitForMergeUpdate\n判断是否使用队列走合并库存逻辑\n1.单个sku+activityId\n2.仅限下单减库存和付款成功2个操作\n3.库存充足\n
+secKillStockBusiness -> secKillStockBusiness: 是否合并队列具体的判断逻辑1. 判断是否符合合并条件\n2.根据skuId、activityId、activityStatus构建killQueueGroup\n3.判断该ConcurrentHashMap<KillQueueGroup, MergeUpdateStockWorker> workerMap\ngroup是否存在，存在即正在处于合并库存当中\n4.如果不存在，判断当前并发度concurrency是否大于3且workerMap小于200个
+secKillStockBusiness -> secKillStockBusiness: 调用createMergeWorker创建秒杀队列逻辑\n 1.new MergeUpdateStockWorker对象\n2.new Thread，设置为daemon。\n3.启动线程。
+note left: 这是生产者-消费者模型 \n每个worker中都有ArrayBlockingQueue\n多个producer，单个消费者去消费队列
+secKillStockBusiness -> MergeUpdateStockWorker: 消费者流程如下\n1.while循环从queue.poll()中获取UpdateStockParam任务\n2.单次合并任务每次为10个。\n3.当获取的任务数为10个或者poll()为null，跳出while循环\n4.如果不存在任务，调用queue.take()挂起consumer\n(双重循环，获取后continue又走到1-3的循环当中)。\n直到producer投递任务\n5.调用doMergeUpdate方法进行合并库存扣减
+MergeUpdateStockWorker -> MergeUpdateStockWorker: 1.对任务按照eventType进行分组group，\n保证合并的队列的skuId是相同\n2.构造新的UpdateStockParam\n将组内的扣减的库存合并\n
+MergeUpdateStockWorker -> StockBusiness: 调用operateStockMerged做实际的库存修改\n(这里有1.插入库存修改流水，2.库存修改\n所以使用@transactional)具体流程如下\n1.批量插入库存修改流水记录\n2.更新记录sku_stock表的sku的库存记录
+note left: 当库存不足等原因导致库存扣减失败\n就抛出异常进行本地事务回滚\n再拆分为依次扣减
+MergeUpdateStockWorker -> MergeUpdateStockWorker: 如果扣减库存成功，就依次唤醒所有的等待的线程。\n每个UpdateStockParam任务都有StockPromise\n采用wait()，notify()来挂起和唤醒线程
+MergeUpdateStockWorker -> MergeUpdateStockWorker: 如果扣减库存失败 就退化成依次扣减。\n1.对任务按照购买数量排序。保证扣减成功率\n2.扣减成功，通知对应的dubbo线程唤醒\n3.扣减失败，认为库存不足，\n接下来所有的请求都需要主动失败唤醒。
+secKillStockBusiness -> secKillStockBusiness: 调用queueForMergeUpdate加入合并队列任务，返回StockPromise。\n1. 创建UpdateStockParam任务\n2.根据UpdateStockParam创建KillQueueGroup\n3.从workerMap中获取合并任务队列\n4.将当前请求加入等待队列,并且返回StockPromise
+secKillStockBusiness -> secKillStockBusiness: 1.对于加入合并队列失败的请求采用批量插入数据库\n2.等待stockPromiseList的任务全部返回。\nstockPromise.waitComplete(200)\n3.如果扣减失败就抛出异常\n4. 如果是库存不足就立即更新缓存。上游就不会再创建订单
+note left:注意点 一个订单可能批量扣减多个sku的库存。\n批量合并后是异步操作，会存在数据不一致\n比如2个sku库存操作成功，1个操作失败。抛出异常。\n这时候由上游保证最终一致性。\n即发送订单创建失败消息，这里做库存的回滚。保证一致性
+@enduml

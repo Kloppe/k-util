@@ -1,0 +1,20 @@
+@startuml
+ItemComponentController -> ItemComponentService: 调用route方法具体创建,\n入参ComponentItemForm
+note left: 商品创建 /create
+ItemComponentService -> ItemComponentService: 1.根据类目、渠道等信息查询组件模板列表\nItemTemplateDTO,包括基础components和\nskuComponents, 全局的都能搜出
+ItemComponentService -> ItemComponentService: 2.获取上架商品的全部rules并过滤出关联组件的规则
+ItemComponentService -> ItemComponentService: 3.对所有的组件执行关联组件规则筛选出命中的组件
+note left: 关联组件是 a组件展示，b组件才展示\n 每个规则都有作用的组件id
+ItemComponentService -> 组件参数校验模块: 4.validateForComponent(Map form, List components)调用组\n件参数校验
+note left: 组件校验采用的是策略模式，\n根据type选择对应的validator执行器来执行 \n 入参有form表单值和组件自生的条件Map
+组件参数校验模块 -> 组件参数校验模块: 5. 执行sku的关联组件校验规则 \n入参为sku表单 "skuForms"，\n执行groovy后端脚本
+note left: sku的每个属性都是一个组件，存在多个组件之间校验。\n 比如市场价小于售价, 会员价大于售价等\n采用groovy动态规则校验
+
+ItemComponentService -> ItemContextBuilder: 构造商品上下文 入参为componentItemForm和组件列表
+ItemContextBuilder -> ItemContextBuilder: 1. 新建ItemContext对象 \n2.将form表单内容塞到对象中\n3.设置类目是否改变\n4.更改sku情况\n.从表单中构建sku信息、主图、名字等信息
+ItemComponentService -> 组件发布规则: 执行商品的发布规则 \n1.获取发布商品的规则列表依次执行\n2.这个主要是零时控制商发布权限，比如积分品不然发布等
+ItemComponentService -> itemFlowExecutor: 流程引擎执行过程\n1. 从itemFlowFactory获取唯一的itemFlow\n2.构造ItemFLowVisitor监控执行\n3.流程引擎分为3个阶段 check阶段、预处理阶段、后置处理阶段\n4.每个Node节点有accept、process ClusterItemHandler的意思是会选其中一个执行。\n
+ItemComponentService -> ItemCenter: 在preHandle做不同渠道特殊的业务处理\n ItemCenter中做商品核心数据保存，tag、供应链这些数据都是在业务层的posthandler上处理\n保证基础服务的稳定性
+note left: 商品发布流程引擎 \n为了应对不同类型商品需要做不同的处理 \n且符合开闭原则 \n 在check节点中主要做商品发布的业务校验\n比如商品sku数量、类目是否改变等等\n在prehandler做商品保存的前置业务处理\n比如佣金计算、sku处理等\npostHandler做商品创建的后置处理 \n比如更新标签、更新erp库存等
+
+@enduml

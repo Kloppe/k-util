@@ -1,0 +1,11 @@
+@startuml
+actor 前端
+前端 -> TarzanRankAPI: personalizeRecommend\n(RankPersonalizeRecommendParam)\n获取个性化榜单信息
+note left: 个性化榜单商品推荐，\n入参有鲁班code,bizCode榜单类型入口,\n前台类目id,rankTypeList
+TarzanRankAPI -> RankRecommendContext: 根据bizCode选择对应的RankRecommendStrategy\n实现了统一的推荐接口recommend()
+RankRecommendContext -> TarzanRankApiService: 1.构建榜单查询参数ListRecommendParam\n(一类类目，榜单类型)\n2.调用ListSearchApi#listRecommend排行榜查询\n3.返回RankGoodsDTO的分页数据\n(RankGood有榜单名字，rankPosition,rankSocre)\n一级商品基础属性
+note left: 排行榜的商品是大数据跑出后回流到tarzan数据库\n,tarzan再同步给搜索的es中。\n查询走搜索的接口查询
+RankRecommendContext -> RankRecommendContext: 1.根据tarzanId查询tarzanTemplate模板数据。\n.将模板的字段采用filterChain进行统一封装。\n3.返回的RankGood转换成TarzanItemRank，完善榜单的模板
+TarzanRankItemServiceImpl -> TarzanRankAPI: 返回排行榜信息List<TarzanItemRankDTO>
+@enduml
+

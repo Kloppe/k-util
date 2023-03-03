@@ -1,0 +1,9 @@
+@startuml
+TarzanQueryAPI -> TarzanQueryAPI: 调用isExist()
+note left: 根据鲁班code码查看
+TarzanQueryAPI -> TarzanService: 调用getByRubanCode()
+TarzanService -> TarzanMapper: 根据rubanCode获取tarzan配置信息
+TarzanService -> tarzanTemplateService: 根据type+moduleId+channel\n获取字段配置模板
+TarzanService -> TarzanService: 组合成TarzanView
+TarzanService -> TarzanQueryAPI: 返回TarzanView
+@enduml

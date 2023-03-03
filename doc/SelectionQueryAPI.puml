@@ -1,0 +1,13 @@
+@startuml
+SelectionQueryAPI -> TarzanSelectionService: 调用querySelectionRule()获取选品规则
+note left: 查询选品规则
+TarzanSelectionService -> TarzanSelectionService: 根据鲁班Id调用getByCode()获取规则
+TarzanSelectionService ->TarzanSelectionService: 封装SelectionRuleDTO对象返回
+
+SelectionQueryAPI -> SelectionItemFacade: 调用querySelectionItems()获取商品图墙
+note left: 目前仅支持乐高页的商品图墙 \n是调用搜索神算获取商品元数据
+SelectionItemFacade -> SelectionApiService: 调用selectItem2C()获取商品元数据ItemMetaView列表
+note left: SelectionApi#调用selectItem2C()是搜索提供的接口
+SelectionItemFacade -> itemMetaPerfectTemplate: 调用perfect方法构造TarzanItemDTO
+
+@enduml

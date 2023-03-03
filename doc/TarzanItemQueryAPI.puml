@@ -1,0 +1,15 @@
+@startuml
+actor 前端
+前端 -> TarzanItemQueryAPI: 调用recommend(TarzanItemParam)\n获取商品素材列表
+note left: 根据鲁班code获取商品列表\n入参rankType,rubanCode、\nchannel、bizType等\n channel是区分火星、批发等，\nbizType是区分排行、N件N折等
+TarzanItemQueryAPI -> ItemRecommendContext:根据channel和bizCode获取不同\n的策略ItemRecommendStrategy
+TarzanItemQueryAPI -> ItemRecommendStrategy: 调用recommend(TarzanItemParam)分页获取商品
+note left: ItemRecommendStrategy\n继承AbstractItemMetaHandler，\n模板实现了商品列表获取
+ItemRecommendStrategy -> TarzanParamHandleFacade: 调用normalCall()方法获取TarzanItemDto分页数据\n1.根据鲁班code从\nTarzan配置表中获取泰山配置\n2.根据type、channel、moduleType\n查找TarzanTemplate中的模板配置\n3.从Template中获取基础字段、扩展字段、自定义字段\n4.根据tarzanId从tarzan_bind_rel表获取关联的tarzanId\n5.构建tarzanview并组装成SearchaParam返回
+note left: 根据鲁班code获取泰山配置参数，\n组装成SearchParam进行具体的商品搜索
+ItemRecommendStrategy -> TarzanItemMetaFacade: 1. 调用TarzanSearchApiService#pageHorseSearch()\n搜索接口获取商品素材列表Page<ItemMetaView>\n(搜索的数据是在鲁班后台配置TarzanItem里配置,\n且同步一份到搜索es中，查询走es查询，跑赛马算法)\n2.如果搜索获取不到列表就要走容灾策略。\n3.调用tarzanItemRecoveryFacade#recovery进行容灾\n(从TarzanItem表中捞出商品数据)
+ItemRecommendStrategy -> ItemMetaPerfectTemplate: 商品或店铺数据完善模板\n1.获取素材完善模板策略MetaPerfectStrategy\n2.调用其perfect方法，将List<ItemMetaView>转化成List<TarzanItemDTO>\n3.处理基础属性、扩展属性、自定义属性(采用filter模式，存在就执行，预先注册了属性操作Chainhandler列表)
+ItemRecommendStrategy -> TarzanItemDeduplicationFacade: 商品去重，按照userId+rubanCode进行缓存。\n缓存的value是List<Long> items \n一页10个数据，和value去重去重后返回并加到缓存中\n(需要添加采用分布式锁)
+ItemRecommendStrategy -> 前端: 返回PageResultDTO<TarzanItemDTO>
+@enduml
+
