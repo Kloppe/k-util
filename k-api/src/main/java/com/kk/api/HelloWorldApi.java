@@ -1,7 +1,7 @@
 package com.kk.api;
 
-import com.kk.domain.dto.HelloWorldDTO;
-import com.kk.domain.param.HelloWorldParam;
+import com.kk.model.dto.HelloWorldDTO;
+import com.kk.model.param.HelloWorldParam;
 
 /**
  * @author juejin

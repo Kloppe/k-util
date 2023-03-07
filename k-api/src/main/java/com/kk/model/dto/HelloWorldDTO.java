@@ -1,6 +1,6 @@
-package com.kk.domain.dto;
+package com.kk.model.dto;
 
-import com.kk.domain.param.DefaultSerializable;
+import com.kk.model.param.DefaultSerializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

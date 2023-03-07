@@ -1,4 +1,4 @@
-package com.kk.domain.param;
+package com.kk.model.param;
 
 import java.io.Serializable;
 
