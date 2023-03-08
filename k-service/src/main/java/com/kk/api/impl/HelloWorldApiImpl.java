@@ -1,8 +1,8 @@
 package com.kk.api.impl;
 
 import com.kk.api.HelloWorldApi;
-import com.kk.domain.dto.HelloWorldDTO;
-import com.kk.domain.param.HelloWorldParam;
+import com.kk.model.dto.HelloWorldDTO;
+import com.kk.model.param.HelloWorldParam;
 import org.springframework.stereotype.Service;
 
 /**

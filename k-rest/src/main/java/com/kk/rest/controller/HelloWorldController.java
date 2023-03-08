@@ -2,7 +2,7 @@ package com.kk.rest.controller;
 
 import com.kk.commons.Result;
 import com.kk.commons.utils.ResultUtil;
-import com.kk.domain.param.HelloWorldParam;
+import com.kk.model.param.HelloWorldParam;
 import com.kk.model.view.HelloWorldView;
 import com.kk.service.hello.HelloWorldService;
 import io.swagger.annotations.ApiImplicitParam;

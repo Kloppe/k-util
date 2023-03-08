@@ -1,6 +1,6 @@
 package com.kk.service.hello;
 
-import com.kk.domain.param.HelloWorldParam;
+import com.kk.model.param.HelloWorldParam;
 import com.kk.model.view.HelloWorldView;
 import org.springframework.stereotype.Service;
 
