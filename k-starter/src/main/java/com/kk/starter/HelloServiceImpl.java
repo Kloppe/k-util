@@ -1,6 +1,6 @@
-package com.test.api.impl;
+package com.kk.starter;
 
-import com.test.api.HelloService;
+
 import org.springframework.stereotype.Component;
 
 /**

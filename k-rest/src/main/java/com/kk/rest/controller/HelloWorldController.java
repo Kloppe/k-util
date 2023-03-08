@@ -3,6 +3,7 @@ package com.kk.rest.controller;
 import com.kk.commons.Result;
 import com.kk.commons.utils.ResultUtil;
 import com.kk.model.param.HelloWorldParam;
+import com.kk.model.param.HelloWorldQueryParam;
 import com.kk.model.view.HelloWorldView;
 import com.kk.service.hello.HelloWorldService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,7 +38,7 @@ public class HelloWorldController {
             @ApiImplicitParam(paramType = "query",name ="hello", value = "输入")
     })
     public Result<HelloWorldView> helloWorld(String hello){
-        HelloWorldParam param = new HelloWorldParam();
+        HelloWorldQueryParam param = new HelloWorldQueryParam();
         HelloWorldView view = helloWorldService.hello(param);
         return ResultUtil.buildSuccessResult(view);
     }

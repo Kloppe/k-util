@@ -1,4 +1,4 @@
-package com.test.api;
+package com.kk.starter;
 
 /**
  * HelloService

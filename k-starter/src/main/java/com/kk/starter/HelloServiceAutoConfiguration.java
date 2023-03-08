@@ -1,4 +1,4 @@
-package com.test.api;
+package com.kk.starter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;

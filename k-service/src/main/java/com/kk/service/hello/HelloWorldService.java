@@ -1,6 +1,7 @@
 package com.kk.service.hello;
 
 import com.kk.model.param.HelloWorldParam;
+import com.kk.model.param.HelloWorldQueryParam;
 import com.kk.model.view.HelloWorldView;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class HelloWorldService {
 
 
-    public HelloWorldView hello(HelloWorldParam param){
+    public HelloWorldView hello(HelloWorldQueryParam param){
 
         HelloWorldView view = new HelloWorldView();
         view.setName("hello");

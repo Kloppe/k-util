@@ -1,19 +1,18 @@
-package com.ggj.category.property.util;
+package com.kk.commons.utils;
+
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.BeanUtils;
-
-import com.google.common.collect.Lists;
-
 /**
- * @author wubh created at:2017年6月28日 上午10:01:42
+ *
  */
 public class BeansUtil {
 
@@ -23,7 +22,6 @@ public class BeansUtil {
      * @param fs
      * @param function
      * @return
-     * @author wbh created at:2017年6月28日 上午10:01:48
      */
     public static <F, T> List<T> transformList(Collection<F> fs, Function<F, T> function) {
         if (CollectionUtils.isEmpty(fs)) {
@@ -38,7 +36,6 @@ public class BeansUtil {
      * @param source
      * @param target
      * @return
-     * @author wbh created at:2017年6月28日 上午10:05:01
      */
     public static <T, E> E copyProperties(T source, Class<E> target) {
         try {
@@ -51,6 +48,17 @@ public class BeansUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @param list
+     * @param clazz
+     * @param <T>
+     * @param <F>
+     * @return
+     */
+    public static <T, F> List<F> copyList(List<T> list, Class<F> clazz) {
+        return list.stream().map(t -> copyProperties(t, clazz)).collect(Collectors.toList());
     }
 
     /**
@@ -95,15 +103,5 @@ public class BeansUtil {
         }
     }
 
-    /**
-     * @param list
-     * @param clazz
-     * @param <T>
-     * @param <F>
-     * @return
-     */
-    public static <T, F> List<F> copyList(List<T> list, Class<F> clazz) {
-        return list.stream().map(t -> copyProperties(t, clazz)).collect(Collectors.toList());
-    }
 
 }
