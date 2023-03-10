@@ -52,7 +52,7 @@ public class CopyTest {
 
         System.out.println(copy);// Copy{type='0', colorList=[Color{color='1'}, Color{color='2'}]}
 
-        // 修改 source 的list属性 copy属性bu会改
+        // 修改 source 的list属性 copy属性不会改
         list.add(new Color("3"));
         System.out.println(copy);
 

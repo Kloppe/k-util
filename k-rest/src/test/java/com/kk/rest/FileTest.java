@@ -22,8 +22,8 @@ public class FileTest {
     @Test
     public void fileTest() throws IOException {
         File file = new File(".");
-        System.out.println(file.getAbsolutePath());
-        System.out.println(file.getCanonicalPath());
+        System.out.println(file.getAbsolutePath()); // /Users/gejiawangluo/juejin/kk/k-util/k-rest/.
+        System.out.println(file.getCanonicalPath()); // /Users/gejiawangluo/juejin/kk/k-util/k-rest
         System.out.println(file.getPath());
         System.out.println(file.getParent());
         System.out.println(file.getParentFile());
@@ -46,7 +46,7 @@ public class FileTest {
             System.out.println(fileName);
         }
         System.out.println("-----------");
-        System.out.println(ppPrint(Arrays.asList(fileNames)));
+        System.out.println(ppPrint(Arrays.asList(fileNames))); // 打印方法
     }
 
     public static String ppPrint(Collection<?> col) {
@@ -66,7 +66,7 @@ public class FileTest {
 
     @Test
     public void readFileTest() throws IOException {
-        readFile("./pom.xml");
+        readFile("./pom.xml"); // 读文件
     }
 
 
@@ -85,7 +85,7 @@ public class FileTest {
     // ##################### nio ##################
 
     @Test
-    public void testFile() throws IOException {
+    public void testFile() throws IOException { // nio 写数据
         FileChannel fc = new FileOutputStream("./data.txt").getChannel();
         fc.write(ByteBuffer.wrap("some text".getBytes()));
         fc.close();
