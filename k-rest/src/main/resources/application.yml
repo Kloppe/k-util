@@ -1,0 +1,4 @@
+#指定log的配置文件
+logging:
+  config: classpath:logback-spring.xml
+
